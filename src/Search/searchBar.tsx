@@ -3,13 +3,25 @@ import * as React from 'react';
 import { Col, Row } from 'react-flexbox-grid';
 
 const styles = {
-  border: '1px solid black',
-  borderRadius: '50px',
-  height: '42px',
-  marginTop: '24px',
+  border: 'none',
+  height: '60px',
   textAlign: 'center',
   width: '600px',
+  padding: '0px',
+  fontSize: '1.2rem',
 } as React.CSSProperties;
+
+const searchButtonStyle = {
+  border: 'none',
+  height: '61px',
+  width: '126px',
+  backgroundColor: '#ff4554',
+  color: '#fff',
+  fontFamily: 'sans-serif',
+  fontSize: '1.2rem',
+  padding: '0px',
+  cursor: 'pointer',
+}
 
 const API_URL = 'http://www.amiiboapi.com/api/';
 
@@ -88,14 +100,14 @@ class Search extends React.Component<IState> {
 
   public renderHomePage = () => {
     return (
-    <section>
+    <section style={{ border: '1px solid #c3c3c3' }}>
       <input
           ref={(input) => { this.searchInput = input; }} 
           style={styles}
           type="text"
           value={this.state.searchTerm} onChange={this.changeSearch}
       />
-      <button type="submit" onClick={this.submitSearch}>Search</button>
+      <button style={searchButtonStyle} type="submit" onClick={this.submitSearch}>Search</button>
     </section>);
   }
 
@@ -116,7 +128,7 @@ class Search extends React.Component<IState> {
   public render() {
     return (
       <section>
-        <Row center="xs">
+        <Row center="xs" style={{ marginTop: '24px' }}>
           {this.renderHomePage()}
         </Row>
         <Row>
