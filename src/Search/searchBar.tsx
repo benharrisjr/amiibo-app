@@ -1,54 +1,18 @@
+// tslint:disable:no-console
 import axios from 'axios';
 import * as React from 'react';
 import { Col, Row } from 'react-flexbox-grid';
-
-const styles = {
-  border: 'none',
-  height: '60px',
-  textAlign: 'center',
-  width: '600px',
-  padding: '0px',
-  fontSize: '1.2rem',
-} as React.CSSProperties;
-
-const searchButtonStyle = {
-  border: 'none',
-  height: '61px',
-  width: '126px',
-  backgroundColor: '#ff4554',
-  color: '#fff',
-  fontFamily: 'sans-serif',
-  fontSize: '1.2rem',
-  padding: '0px',
-  cursor: 'pointer',
-}
-
-const API_URL = 'http://www.amiiboapi.com/api/';
+import { searchStyles, searchButtonStyle } from './styles';
+import { API_URL } from './constants';
 
 interface IState {
   searchTerm?: string | null,
   characterList?: string[] | null,
   amiiboList?: any[] | null,
   searched?: boolean,
+  noResults?: boolean,
+  selectedOption?: string,
 }
-
-// interface IAmiibo {
-//   amiiboSeries: string,
-//   character: string,
-//   gameSeries: string,
-//   head: string,
-//   image: string,
-//   name: string,
-//   release: object,
-//   // {
-//   //   au: "2014-11-29",
-//   //   eu: "2014-11-28",
-//   //   jp: "2014-12-06",
-//   //   na: "2014-11-21"
-//   // },
-//   tail: string,
-//   type: string,
-// }
 
 class Search extends React.Component<IState> {
   public state = {
@@ -56,70 +20,104 @@ class Search extends React.Component<IState> {
     characterList: [],
     searchTerm: '',
     searched: false,
+    noResults: false,
+    selectedOption: 'character',
   }
   public searchInput :any = {};
   public componentDidMount = () => {
-    this.setTypeAhead();
+    // this.setTypeAhead();
     this.searchInput.focus();
   }
 
   public setTypeAhead = () => {
-    axios.get(`${API_URL}amiibo`)
+    axios.get(`${API_URL}character`)
       .then(({ data }) => {
-        // tslint:disable-next-line:no-console
         const characterList :string[] = [];
-        // characterList = data.amiibo.map((amiibo :any) => characterList.push(amiibo.character))
-        // tslint:disable-next-line:no-console
-        data.amiibo.map((amiibo :any) => characterList.push(amiibo.character))
+        data.amiibo.map((character :any) => characterList.push(character.name))
         this.setState({
           characterList,
         })
       })
   }
   public changeSearch = (e: any) => {
-    // tslint:disable-next-line:no-console
-    console.log(this.state);
     this.setState({searchTerm: e.target.value});
   }
 
+  public handleRadioChange = (e :any) => {
+    this.setState({selectedOption: e.target.value})
+  }
+
   public submitSearch = () => {
-    // TODO: Add error handling for no results
-    axios.get(`${API_URL}amiibo?character=${this.state.searchTerm}`)
+    let searchString :string = '';
+    if (this.state.selectedOption === 'character'){
+      searchString = 'amiibo?character=';
+    }
+    if (this.state.selectedOption === 'game'){
+      searchString = 'amiibo?gameseries=';
+    }
+    axios.get(`${API_URL}${searchString}${this.state.searchTerm}`)
       .then(({ data }) => {
-        // tslint:disable-next-line:no-console
-        console.log(data);
         this.setState({
           amiiboList: data.amiibo,
           searched: true,
+          noResults: false,
         })
-        // tslint:disable-next-line:no-console
-        console.log(this.state);
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setState({
+          amiiboList: [],
+          noResults: true,
+        })
       })
 
   }
 
   public renderHomePage = () => {
     return (
-    <section style={{ border: '1px solid #c3c3c3' }}>
-      <input
-          ref={(input) => { this.searchInput = input; }} 
-          style={styles}
-          type="text"
-          value={this.state.searchTerm} onChange={this.changeSearch}
-      />
-      <button style={searchButtonStyle} type="submit" onClick={this.submitSearch}>Search</button>
-    </section>);
+      <section>
+        <Row>
+          <section style={{ border: '1px solid #c3c3c3' }}>
+            <input
+                ref={(input) => { this.searchInput = input; }} 
+                style={searchStyles}
+                type="text"
+                value={this.state.searchTerm} onChange={this.changeSearch}
+            />
+            <button style={searchButtonStyle} type="submit" onClick={this.submitSearch}>Search</button>
+          </section>
+        </Row>
+        <Row>
+          <label>
+            <input
+              type="radio"
+              value="character"
+              checked={this.state.selectedOption === 'character'}
+              onChange={this.handleRadioChange}
+            />
+            Character
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="game"
+              checked={this.state.selectedOption === 'game'}
+              onChange={this.handleRadioChange}
+            />
+            Game
+          </label>
+        </Row>
+      </section>
+    );
   }
 
   public renderSearchResults = () => {
     return (
       this.state.amiiboList.map((amiibo :any, index :number) => {
-          // tslint:disable-next-line:no-console
-          console.log(amiibo.name);
           return (
             <Col xs={3} key={index}>
               <p>{amiibo.name}</p>
-              <img src={amiibo.image} />
+              <img style={{ maxHeight: '400px' }} src={amiibo.image} />
             </Col>
           );
         }));
@@ -134,11 +132,9 @@ class Search extends React.Component<IState> {
         <Row>
           {this.state.searched && this.renderSearchResults()}
         </Row>
-        {/* { this.state.searchTerm !== '' &&
-          <section>
-            {this.state.characterList.map((character) => <div key={character}>{character}</div>)}
-          </section>
-        } */}
+        <Row center="xs" style={{ paddingTop: '60px' }}>
+          {this.state.noResults && "No results"}
+        </Row>
       </section>
     );
   }
