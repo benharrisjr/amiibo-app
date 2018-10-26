@@ -6,13 +6,13 @@ export const searchStyles = {
   textAlign: 'center',
   padding: '0px',
   fontSize: '1.2rem',
-  width: '100%',
+  minWidth: '50%',
 } as React.CSSProperties;
 
 export const searchButtonStyle = {
   border: 'none',
   height: '61px',
-  width: '126px',
+  minWidth: '50%',
   backgroundColor: '#ff4554',
   color: '#fff',
   fontFamily: 'sans-serif',
