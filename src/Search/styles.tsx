@@ -1,12 +1,12 @@
 import * as React from 'react';
 
 export const searchStyles = {
-  border: 'none',
+  border: '1px solid #c3c3c3',
   height: '60px',
   textAlign: 'center',
-  width: '600px',
   padding: '0px',
   fontSize: '1.2rem',
+  width: '100%',
 } as React.CSSProperties;
 
 export const searchButtonStyle = {

@@ -9,7 +9,8 @@ class App extends React.Component {
         <header className="App-header">
           <h1 className="App-title">Amiibo App</h1>
         </header>
-          <Search />
+        <Search />
+        <footer className="App-header">Powered by <a href="http://www.amiiboapi.com/">http://www.amiiboapi.com/</a></footer>
       </div>
     );
   }
